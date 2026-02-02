@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Our 2025 Scrapbook</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&family=Dancing+Script:wght@700&display=swap');
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            color: white;
+            transition: background-color 0.8s ease;
+        }
+
+        /* Branding Header */
+        .diary-header {
+            position: absolute;
+            top: 45px; width: 100%; text-align: center; z-index: 500;
+        }
+        .diary-header h2 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.2rem; color: white; margin: 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Navigation Zones */
+        .nav-zone { position: absolute; top: 0; height: 100%; z-index: 1000; }
+        #left-zone { left: 0; width: 30%; } 
+        #right-zone { right: 0; width: 70%; }
+
+        .story-container { position: relative; width: 100%; height: 100%; }
+
+        /* Slide Layout */
+        .slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .slide.active { opacity: 1; z-index: 10; }
+
+        /* Photo Box (Polaroid Style) */
+        .photo-box {
+            background: white;
+            padding: 12px 12px 40px 12px;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: rotate(-3deg);
+            max-width: 80%;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .photo-box img { width: 100%; border-radius: 2px; display: block; }
+
+        /* The Arrow */
+        .arrow-draw {
+            font-size: 40px;
+            color: white;
+            margin: 10px 0;
+            transform: rotate(90deg);
+            opacity: 0.7;
+            font-family: cursive;
+        }
+
+        /* The Text Box */
+        .text-box {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .caption { font-size: 0.9rem; line-height: 1.5; margin: 0; font-weight: 500; white-space: pre-line; color: white; }
+
+        /* Floating Hearts Background */
+        .heart-bg {
+            position: absolute;
+            top: -10%; font-size: 20px;
+            opacity: 0.3;
+            animation: drift 5s linear infinite;
+            z-index: 1;
+        }
+        @keyframes drift {
+            from { transform: translateY(0) rotate(0deg); }
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        /* Progress Bars */
+        .progress-container {
+            position: absolute; top: 25px; left: 0; width: 100%;
+            display: flex; padding: 0 8px; box-sizing: border-box; z-index: 600; gap: 3px;
+        }
+        .prog-bar { height: 3px; background: rgba(255,255,255,0.3); flex-grow: 1; border-radius: 2px; }
+        .prog-bar.filled { background: #fff; }
+
+        /* End Slide */
+        .end-slide { justify-content: center; }
+        .days-big { font-size: 5rem; font-weight: 700; line-height: 1; }
+    </style>
+</head>
+<body id="bg">
+
+    <div class="progress-container" id="progContainer"></div>
+    <div class="diary-header"><h2>2025 Diary</h2></div>
+
+    <div id="left-zone" class="nav-zone" onclick="prev()"></div>
+    <div id="right-zone" class="nav-zone" onclick="next()"></div>
+
+    <div class="story-container" id="storyContainer"></div>
+
+    <script>
+        const diaryData = [
+            { img: 'IMG_20260118_170400.jpg', text: "Do you remember this day?❤️\nIt was the first flower I gave you.", color: "#4a5d4a" },
+            { img: 'IMG_20250517_130928.jpg', text: "This day I felt like you are the one for me\n You looked so beautiful.", color: "#5d4a5d" },
+            { img: 'IMG_20250512_221425.jpg', text: "These nightwalks were the half of our story.", color: "#2c3e50" },
+            { img: 'IMG_20250626_143147.jpg', text: "Our paired shoe photo 👟👟", color: "#6d5b4b" },
+            { img: 'MVIMG_20251014_193539.jpg', text:"FuchkaVai trip 🌃", color: "#1a1a2e" },
+            { img: 'Messenger_creation_B6B8229F-13E9-480F-9566-63A2F37314B8.jpg', text: "First time seeing you in Saree 😍", color: "#4a1c1c" },
+            { img: 'IMG_20250529_125417.jpg', text: "Rainy day ☔ Photo.", color: "#34495e" },
+            { img: 'IMG_20250207_211600.jpg', text: "Your favourite Faluda 🍨", color: "#5d4037" },
+            { img: 'IMG_20250130_123846.jpg', text: "My first gift to you.", color: "#2e7d32" },
+            { img: 'IMG_20251023_191423.jpg', text: "Our shadow love 👫", color: "#424242" },
+            { img: 'IMG_20250523_202614.jpg', text: "The ring photo ❤️", color: "#5c6bc0" },
+            { img: 'IMG_20251201_174528.jpg', text: "That kiss and your laugh ❤️", color: "#ad1457" },
+            { img: 'IMG_20250207_201335.jpg', text: "The food we lost from dhali.", color: "#6d4c41" },
+            { img: 'IMG_20251202_002047.jpg', text: "The Villain and the Princess.", color: "#311b92" },
+            { img: 'IMG_20250916_203053.jpg', text: "First movie together 🎬", color: "#212121" },
+            { img: 'IMG_20251012_164748.jpg', text: "Pretty Mehedi design.", color: "#1b5e20" },
+            { img: 'IMG_20250625_190103.jpg', text: "You crazy girl 😂", color: "#bf360c" },
+            { img: 'IMG_20251130_185617.jpg', text: "Lipstick Queen 💄", color: "#880e4f" },
+            { img: 'IMG_20251201_171307.jpg', text: "Ekta pakhi arekta pakhi...", color: "#004d40" },
+            { img: 'IMG_20250207_200948.jpg', text: "My absolute favorite photo. ❤️", color: "#b71c1c" },
+            { type: 'counter', title: "FOREVER", color: "#000000" }
+        ];
+
+        let idx = 0;
+        const container = document.getElementById('storyContainer');
+        const progContainer = document.getElementById('progContainer');
+        const bg = document.getElementById('bg');
+
+        diaryData.forEach((item, i) => {
+            const slide = document.createElement('div');
+            slide.className = `slide ${i === 0 ? 'active' : ''}`;
+            
+            if (item.type === 'counter') {
+                const diff = Math.floor((new Date() - new Date("May 25, 2025")) / (1000*60*60*24));
+                slide.innerHTML = `<div class="days-big">${diff}</div><p>DAYS OF US</p>`;
+            } else {
+                slide.innerHTML = `
+                    <div class="photo-box"><img src="${item.img}"></div>
+                    <div class="arrow-draw">➔</div>
+                    <div class="text-box"><p class="caption">${item.text}</p></div>
+                `;
+            }
+            container.appendChild(slide);
+
+            const bar = document.createElement('div');
+            bar.className = `prog-bar ${i === 0 ? 'filled' : ''}`;
+            progContainer.appendChild(bar);
+        });
+
+        const slides = document.querySelectorAll('.slide');
+        const bars = document.querySelectorAll('.prog-bar');
+
+        function update() {
+            slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+            bars.forEach((b, i) => b.classList.toggle('filled', i <= idx));
+            bg.style.backgroundColor = diaryData[idx].color;
+            if (idx % 2 === 0) createHearts();
+        }
+
+        function createHearts() {
+            const h = document.createElement('div');
+            h.className = 'heart-bg';
+            h.innerText = '❤️';
+            h.style.left = Math.random() * 100 + 'vw';
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), 5000);
+        }
+
+        function next() { if (idx < diaryData.length - 1) { idx++; update(); } }
+        function prev() { if (idx > 0) { idx--; update(); } }
+        
+        update(); // Initial load
+    </script>
+</body>
+</html>
